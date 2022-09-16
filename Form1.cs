@@ -4,12 +4,12 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Commons.Media.PortAudio;
 using System.Diagnostics;
 using System.IO;
 using System.Globalization;
 using Nett;
 using System.Runtime.InteropServices;
+using NAudio.CoreAudioApi;
 
 namespace FlexASIOGUI
 {
@@ -42,7 +42,7 @@ namespace FlexASIOGUI
 
             // get the value of the "Language for non-Unicode programs" setting (1252 for English)
             // note: in Win11 this could be UTF-8 already, since it's natively supported
-            legacyEncoding = Encoding.GetEncoding((int)GetACP());
+            legacyEncoding = Encoding.GetEncoding("GBK");
 
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
             CultureInfo.DefaultThreadCurrentCulture = customCulture;
@@ -53,7 +53,8 @@ namespace FlexASIOGUI
             this.LoadFlexASIOConfig(TOMLPath);
 
             InitDone = true;
-            SetStatusMessage($"FlexASIO GUI for FlexASIO {flexasioVersion} started ({Configuration.VersionString})");
+            
+            SetStatusMessage($"FlexASIO GUI for FlexASIO {flexasioVersion} started (NAudio 2.1.0)");
             GenerateOutput();
         }
 
@@ -71,10 +72,11 @@ namespace FlexASIOGUI
             numericLatencyInput.Increment = 0.1m;
             numericLatencyOutput.Increment = 0.1m;
 
-            for (var i = 0; i < Configuration.HostApiCount; i++)
-            {
-                comboBackend.Items.Add(Configuration.GetHostApiInfo(i).name);
-            }
+            comboBackend.Items.Add("WasAPI");
+            // for (var i = 0; i < Configuration.HostApiCount; i++)
+            // {
+            //     comboBackend.Items.Add(Configuration.GetHostApiInfo(i).name);
+            // }
 
             if (comboBackend.Items.Contains(flexGUIConfig.backend))
             {
@@ -118,40 +120,27 @@ namespace FlexASIOGUI
             return flexGUIConfig;
         }
 
-        private string DescrambleUTF8(string s)
-        {
-            // portaudio incorrectly returns UTF-8 strings as if they were ANSI (CP1252 for most Latin systems, CP1251 for Cyrillic, etc...)
-            // this line fixes the issue by reading the input as CP* and parsing it as UTF-8
-            var bytes = legacyEncoding.GetBytes(s);
-            return Encoding.UTF8.GetString(bytes);
-        }
-
         private TreeNode[] GetDevicesForBackend(string Backend, bool Input)
         {
             List<TreeNode> treeNodes = new List<TreeNode>();
             treeNodes.Add(new TreeNode("(None)"));
-            for (var i = 0; i < Configuration.DeviceCount; i++)
+            var devices = new MMDeviceEnumerator();
+            if (Input)
             {
-                var deviceInfo = Configuration.GetDeviceInfo(i);
-
-                var apiInfo = Configuration.GetHostApiInfo(deviceInfo.hostApi);
-                
-                if (apiInfo.name != Backend) 
-                    continue;
-
-                if (Input == true)
+                var enpoints = devices.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+                foreach (var endpoint in enpoints)
                 {
-                    if (deviceInfo.maxInputChannels > 0)
-                    {
-                        treeNodes.Add(new TreeNode(DescrambleUTF8(deviceInfo.name)));
-                    }
+                    Console.WriteLine("设备名称：" + endpoint.FriendlyName);
+                    treeNodes.Add(new TreeNode(endpoint.FriendlyName));
                 }
-                else
+            }
+            else
+            {
+                var enpoints = devices.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+                foreach (var endpoint in enpoints)
                 {
-                    if (deviceInfo.maxOutputChannels > 0)
-                    {
-                        treeNodes.Add(new TreeNode(DescrambleUTF8(deviceInfo.name)));
-                    }
+                    Console.WriteLine("设备名称：" + endpoint.FriendlyName);
+                    treeNodes.Add(new TreeNode(endpoint.FriendlyName));
                 }
             }
             return treeNodes.ToArray();
