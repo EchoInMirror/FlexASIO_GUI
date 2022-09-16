@@ -5,7 +5,9 @@
 
 by EIM
 
-对应的 FlexASIO 版本: [FlexASIO](https://github.com/dechamps/FlexASIO/releases/download/flexasio-1.9/FlexASIO-1.9.exe)
+[下载链接](https://github.com/Tryanks/FlexASIO_GUI/releases/download/v0.34-modify/FlexASIO.GUIInstaller_EIMChanged.exe)
+
+对应的 FlexASIO 版本: [FlexASIO v1.9](https://github.com/dechamps/FlexASIO/releases/download/flexasio-1.9/FlexASIO-1.9.exe)
 
 ---
 
