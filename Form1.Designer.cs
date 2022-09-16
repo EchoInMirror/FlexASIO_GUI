@@ -292,7 +292,7 @@ namespace FlexASIOGUI
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(50, 15);
             this.label7.TabIndex = 2;
-            this.label7.Text = "WasAPI";
+            this.label7.Text = "WASAPI";
             // 
             // flowLayoutPanel2
             // 

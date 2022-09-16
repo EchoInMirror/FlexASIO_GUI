@@ -72,7 +72,7 @@ namespace FlexASIOGUI
             numericLatencyInput.Increment = 0.1m;
             numericLatencyOutput.Increment = 0.1m;
 
-            comboBackend.Items.Add("WasAPI");
+            comboBackend.Items.Add("Windows WASAPI");
             // for (var i = 0; i < Configuration.HostApiCount; i++)
             // {
             //     comboBackend.Items.Add(Configuration.GetHostApiInfo(i).name);
