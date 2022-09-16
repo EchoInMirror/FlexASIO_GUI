@@ -1,4 +1,6 @@
-﻿namespace FlexASIOGUI
+﻿using System.Drawing;
+
+namespace FlexASIOGUI
 {
     partial class Form1
     {
@@ -28,6 +30,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.MinimumSize = new Size(1000, 600);
+            
             this.treeDevicesInput = new System.Windows.Forms.TreeView();
             this.treeDevicesOutput = new System.Windows.Forms.TreeView();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
@@ -176,7 +180,7 @@
             this.btSaveAs.Name = "btSaveAs";
             this.btSaveAs.Size = new System.Drawing.Size(75, 24);
             this.btSaveAs.TabIndex = 0;
-            this.btSaveAs.Text = "Save as";
+            this.btSaveAs.Text = "另存为";
             this.btSaveAs.UseVisualStyleBackColor = true;
             this.btSaveAs.Click += new System.EventHandler(this.btSaveAs_Click);
             // 
@@ -189,20 +193,20 @@
             this.btLoadFrom.Name = "btLoadFrom";
             this.btLoadFrom.Size = new System.Drawing.Size(75, 24);
             this.btLoadFrom.TabIndex = 1;
-            this.btLoadFrom.Text = "Load from";
+            this.btLoadFrom.Text = "读取配置";
             this.btLoadFrom.UseVisualStyleBackColor = true;
             this.btLoadFrom.Click += new System.EventHandler(this.btLoadFrom_Click);
             // 
             // btRefreshDevices
             // 
-            this.btRefreshDevices.AccessibleName = "Refresh Devices";
+            this.btRefreshDevices.AccessibleName = "刷新设备列表";
             this.btRefreshDevices.AutoSize = true;
             this.btRefreshDevices.Location = new System.Drawing.Point(577, 3);
             this.btRefreshDevices.MinimumSize = new System.Drawing.Size(0, 23);
             this.btRefreshDevices.Name = "btRefreshDevices";
             this.btRefreshDevices.Size = new System.Drawing.Size(99, 24);
             this.btRefreshDevices.TabIndex = 19;
-            this.btRefreshDevices.Text = "Refresh Devices";
+            this.btRefreshDevices.Text = "刷新设备列表";
             this.btRefreshDevices.UseVisualStyleBackColor = true;
             this.btRefreshDevices.Click += new System.EventHandler(this.btRefreshDevices_Click);
             // 
@@ -213,7 +217,7 @@
             this.btClipboard.Name = "btClipboard";
             this.btClipboard.Size = new System.Drawing.Size(295, 24);
             this.btClipboard.TabIndex = 0;
-            this.btClipboard.Text = "Copy to Clipboard";
+            this.btClipboard.Text = "复制到剪切板";
             this.btClipboard.UseVisualStyleBackColor = true;
             this.btClipboard.Click += new System.EventHandler(this.btClipboard_Click);
             // 
@@ -225,7 +229,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(52, 15);
             this.label3.TabIndex = 0;
-            this.label3.Text = "Backend";
+            this.label3.Text = "音频后端";
             // 
             // btSaveToProfile
             // 
@@ -234,7 +238,7 @@
             this.btSaveToProfile.Name = "btSaveToProfile";
             this.btSaveToProfile.Size = new System.Drawing.Size(295, 24);
             this.btSaveToProfile.TabIndex = 1;
-            this.btSaveToProfile.Text = "Save to Default FlexASIO.toml";
+            this.btSaveToProfile.Text = "保存到默认FlexASIO.toml";
             this.btSaveToProfile.UseVisualStyleBackColor = true;
             this.btSaveToProfile.Click += new System.EventHandler(this.btSaveToProfile_Click);
             // 
@@ -266,7 +270,7 @@
             this.checkBoxSetOutputLatency.Name = "checkBoxSetOutputLatency";
             this.checkBoxSetOutputLatency.Size = new System.Drawing.Size(127, 19);
             this.checkBoxSetOutputLatency.TabIndex = 19;
-            this.checkBoxSetOutputLatency.Text = "Set Output Latency";
+            this.checkBoxSetOutputLatency.Text = "设置输出延迟";
             this.checkBoxSetOutputLatency.UseVisualStyleBackColor = true;
             this.checkBoxSetOutputLatency.CheckedChanged += new System.EventHandler(this.checkBoxSetOutputLatency_CheckedChanged);
             // 
@@ -288,7 +292,7 @@
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(50, 15);
             this.label7.TabIndex = 2;
-            this.label7.Text = "WASAPI";
+            this.label7.Text = "WasAPI";
             // 
             // flowLayoutPanel2
             // 
@@ -308,7 +312,7 @@
             this.checkBoxWasapiInputSet.Name = "checkBoxWasapiInputSet";
             this.checkBoxWasapiInputSet.Size = new System.Drawing.Size(45, 19);
             this.checkBoxWasapiInputSet.TabIndex = 9;
-            this.checkBoxWasapiInputSet.Text = "Set:";
+            this.checkBoxWasapiInputSet.Text = "启用:";
             this.checkBoxWasapiInputSet.UseVisualStyleBackColor = true;
             this.checkBoxWasapiInputSet.CheckedChanged += new System.EventHandler(this.checkBoxWasapiInputSet_CheckedChanged);
             // 
@@ -319,7 +323,7 @@
             this.wasapiExclusiveInput.Name = "wasapiExclusiveInput";
             this.wasapiExclusiveInput.Size = new System.Drawing.Size(74, 19);
             this.wasapiExclusiveInput.TabIndex = 7;
-            this.wasapiExclusiveInput.Text = "Exclusive";
+            this.wasapiExclusiveInput.Text = "独占模式";
             this.wasapiExclusiveInput.UseVisualStyleBackColor = true;
             this.wasapiExclusiveInput.CheckedChanged += new System.EventHandler(this.wasapiExclusiveInput_CheckedChanged);
             // 
@@ -332,7 +336,7 @@
             this.wasapiAutoConvertInput.Name = "wasapiAutoConvertInput";
             this.wasapiAutoConvertInput.Size = new System.Drawing.Size(94, 19);
             this.wasapiAutoConvertInput.TabIndex = 8;
-            this.wasapiAutoConvertInput.Text = "AutoConvert";
+            this.wasapiAutoConvertInput.Text = "自动转换采样率";
             this.wasapiAutoConvertInput.UseVisualStyleBackColor = true;
             this.wasapiAutoConvertInput.CheckedChanged += new System.EventHandler(this.wasapiAutoConvertInput_CheckedChanged);
             // 
@@ -354,7 +358,7 @@
             this.checkBoxWasapiOutputSet.Name = "checkBoxWasapiOutputSet";
             this.checkBoxWasapiOutputSet.Size = new System.Drawing.Size(45, 19);
             this.checkBoxWasapiOutputSet.TabIndex = 10;
-            this.checkBoxWasapiOutputSet.Text = "Set:";
+            this.checkBoxWasapiOutputSet.Text = "启用:";
             this.checkBoxWasapiOutputSet.UseVisualStyleBackColor = true;
             this.checkBoxWasapiOutputSet.CheckedChanged += new System.EventHandler(this.checkBoxWasapOutputSet_CheckedChanged);
             // 
@@ -365,7 +369,7 @@
             this.wasapiExclusiveOutput.Name = "wasapiExclusiveOutput";
             this.wasapiExclusiveOutput.Size = new System.Drawing.Size(74, 19);
             this.wasapiExclusiveOutput.TabIndex = 8;
-            this.wasapiExclusiveOutput.Text = "Exclusive";
+            this.wasapiExclusiveOutput.Text = "独占模式";
             this.wasapiExclusiveOutput.UseVisualStyleBackColor = true;
             this.wasapiExclusiveOutput.CheckedChanged += new System.EventHandler(this.wasapiExclusiveOutput_CheckedChanged);
             // 
@@ -378,7 +382,7 @@
             this.wasapiAutoConvertOutput.Name = "wasapiAutoConvertOutput";
             this.wasapiAutoConvertOutput.Size = new System.Drawing.Size(94, 19);
             this.wasapiAutoConvertOutput.TabIndex = 9;
-            this.wasapiAutoConvertOutput.Text = "AutoConvert";
+            this.wasapiAutoConvertOutput.Text = "自动转换采样率";
             this.wasapiAutoConvertOutput.UseVisualStyleBackColor = true;
             this.wasapiAutoConvertOutput.CheckedChanged += new System.EventHandler(this.wasapiAutoConvertOutput_CheckedChanged);
             // 
@@ -400,7 +404,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(73, 15);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Input Device";
+            this.label1.Text = "输入设备";
             // 
             // label2
             // 
@@ -410,7 +414,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(83, 15);
             this.label2.TabIndex = 0;
-            this.label2.Text = "Output Device";
+            this.label2.Text = "输出设备";
             // 
             // flowLayoutPanel5
             // 
@@ -429,7 +433,7 @@
             this.checkBoxSetInputLatency.Name = "checkBoxSetInputLatency";
             this.checkBoxSetInputLatency.Size = new System.Drawing.Size(117, 19);
             this.checkBoxSetInputLatency.TabIndex = 20;
-            this.checkBoxSetInputLatency.Text = "Set Input Latency";
+            this.checkBoxSetInputLatency.Text = "设置输入延迟";
             this.checkBoxSetInputLatency.UseVisualStyleBackColor = true;
             this.checkBoxSetInputLatency.CheckedChanged += new System.EventHandler(this.checkBoxSetInputLatency_CheckedChanged);
             // 
@@ -451,7 +455,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(48, 15);
             this.label4.TabIndex = 2;
-            this.label4.Text = "Latency";
+            this.label4.Text = "延迟";
             // 
             // label9
             // 
@@ -462,7 +466,7 @@
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(89, 15);
             this.label9.TabIndex = 13;
-            this.label9.Text = "Output Preview";
+            this.label9.Text = "输出配置预览";
             // 
             // label5
             // 
@@ -472,7 +476,7 @@
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(56, 15);
             this.label5.TabIndex = 14;
-            this.label5.Text = "Channels";
+            this.label5.Text = "声道";
             // 
             // numericChannelsInput
             // 
@@ -537,7 +541,7 @@
             this.checkBoxSetBufferSize.Name = "checkBoxSetBufferSize";
             this.checkBoxSetBufferSize.Size = new System.Drawing.Size(100, 19);
             this.checkBoxSetBufferSize.TabIndex = 7;
-            this.checkBoxSetBufferSize.Text = "Set Buffer Size";
+            this.checkBoxSetBufferSize.Text = "启用缓冲区大小";
             this.checkBoxSetBufferSize.UseVisualStyleBackColor = true;
             this.checkBoxSetBufferSize.CheckedChanged += new System.EventHandler(this.checkBoxSetBufferSize_CheckedChanged);
             // 
@@ -560,7 +564,7 @@
             this.linkLabelDocs.Size = new System.Drawing.Size(217, 15);
             this.linkLabelDocs.TabIndex = 20;
             this.linkLabelDocs.TabStop = true;
-            this.linkLabelDocs.Text = "FlexASIO Configuration Documentation";
+            this.linkLabelDocs.Text = "FlexASIO 配置参考文档";
             this.linkLabelDocs.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.linkLabelDocs.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelDocs_LinkClicked);
             // 

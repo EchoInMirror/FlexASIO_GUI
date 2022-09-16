@@ -20,7 +20,7 @@ namespace FlexASIOGUI
         private string TOMLPath;
         private FlexGUIConfig flexGUIConfig;
         private Encoding legacyEncoding;
-        private string flexasioGuiVersion = "0.34";
+        private string flexasioGuiVersion = "EIMChanged";
         private string flexasioVersion = "1.9";
         private string tomlName = "FlexASIO.toml";
         private string docUrl = "https://github.com/dechamps/FlexASIO/blob/master/CONFIGURATION.md";
@@ -34,7 +34,7 @@ namespace FlexASIOGUI
         {
             InitializeComponent();
             
-            this.Text = $"FlexASIO GUI v{flexasioGuiVersion}";
+            this.Text = $"FlexASIO GUI {flexasioGuiVersion}";
 
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
@@ -125,7 +125,7 @@ namespace FlexASIOGUI
             List<TreeNode> treeNodes = new List<TreeNode>();
             treeNodes.Add(new TreeNode("(None)"));
             var devices = new MMDeviceEnumerator();
-            if (Input)
+            if (!Input)
             {
                 var enpoints = devices.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
                 foreach (var endpoint in enpoints)

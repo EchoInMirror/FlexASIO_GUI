@@ -1,3 +1,14 @@
+此分支对原项目做了以下修改:
+- 修复中文乱码
+- 汉化中文界面
+- 将 PortAudio 替换为 NAudio 只支持获取 WASAPI 音频后端
+
+by EIM
+
+对应的 FlexASIO 版本: [FlexASIO](https://github.com/dechamps/FlexASIO/releases/download/flexasio-1.9/FlexASIO-1.9.exe)
+
+---
+
 This is a small GUI to make the configuration of https://github.com/dechamps/FlexASIO a bit quicker.
 
 It should pick up your existing $Usersprofile/FlexASIO.toml file and read the basic parameters. Not all of them have been implemented yet...
