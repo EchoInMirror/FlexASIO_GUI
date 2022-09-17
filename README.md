@@ -6,6 +6,8 @@
 - 汉化界面
 - 将 PortAudio 替换为 NAudio \(仅支持获取 WASAPI 音频后端\)
 
+![flex gui](https://user-images.githubusercontent.com/73160783/190864559-d8f4c796-50d5-4faa-8640-e8df348cb6c1.png)
+
 ## 下载
 
 [下载链接](https://github.com/Tryanks/FlexASIO_GUI/releases/download/v0.34-modify/FlexASIO.GUIInstaller_EIMChanged.exe)
