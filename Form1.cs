@@ -23,7 +23,7 @@ namespace FlexASIOGUI
         private string flexasioGuiVersion = "EIMChanged";
         private string flexasioVersion = "1.9";
         private string tomlName = "FlexASIO.toml";
-        private string docUrl = "https://github.com/dechamps/FlexASIO/blob/master/CONFIGURATION.md";
+        private string docUrl = "https://github.com/EchoInMirror/FlexASIO_GUI";
 
         [DllImport(@"C:\Program Files\FlexASIO\x64\FlexASIO.dll")]
         public static extern int Initialize(string PathName, bool TestMode);

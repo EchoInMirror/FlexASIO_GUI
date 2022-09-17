@@ -476,7 +476,7 @@ namespace FlexASIOGUI
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(56, 15);
             this.label5.TabIndex = 14;
-            this.label5.Text = "声道";
+            this.label5.Text = "声道数量";
             // 
             // numericChannelsInput
             // 
@@ -541,7 +541,7 @@ namespace FlexASIOGUI
             this.checkBoxSetBufferSize.Name = "checkBoxSetBufferSize";
             this.checkBoxSetBufferSize.Size = new System.Drawing.Size(100, 19);
             this.checkBoxSetBufferSize.TabIndex = 7;
-            this.checkBoxSetBufferSize.Text = "启用缓冲区大小";
+            this.checkBoxSetBufferSize.Text = "设置缓冲区大小";
             this.checkBoxSetBufferSize.UseVisualStyleBackColor = true;
             this.checkBoxSetBufferSize.CheckedChanged += new System.EventHandler(this.checkBoxSetBufferSize_CheckedChanged);
             // 
