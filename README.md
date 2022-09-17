@@ -1,7 +1,7 @@
 此分支对原项目做了以下修改:
 - 修复中文乱码
-- 汉化中文界面
-- 将 PortAudio 替换为 NAudio 只支持获取 WASAPI 音频后端
+- 汉化界面
+- 将 PortAudio 替换为 NAudio \(仅支持获取 WASAPI 音频后端\)
 
 by EIM
 
