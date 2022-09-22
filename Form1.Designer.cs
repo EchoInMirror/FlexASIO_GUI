@@ -360,7 +360,7 @@ namespace FlexASIOGUI
             this.checkBoxWasapiOutputSet.TabIndex = 10;
             this.checkBoxWasapiOutputSet.Text = "启用:";
             this.checkBoxWasapiOutputSet.UseVisualStyleBackColor = true;
-            this.checkBoxWasapiOutputSet.CheckedChanged += new System.EventHandler(this.checkBoxWasapOutputSet_CheckedChanged);
+            this.checkBoxWasapiOutputSet.CheckedChanged += new System.EventHandler(this.checkBoxWasapiOutputSet_CheckedChanged);
             // 
             // wasapiExclusiveOutput
             // 

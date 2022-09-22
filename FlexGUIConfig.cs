@@ -1,29 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace FlexASIOGUI;
 
-namespace FlexASIOGUI
+public class FlexGuiConfig
 {
-    public class FlexGUIConfig
-    {
-        public string backend { get; set; } = "Windows WASAPI";
-        public int? bufferSizeSamples { get; set; } = null;
-        public FlexGUIConfigDeviceSection input { get; set; }
-        public FlexGUIConfigDeviceSection output { get; set; }
+    public string Backend { get; set; } = "Windows WASAPI";
+    public int? BufferSizeSamples { get; set; }
+    public FlexGuiConfigDeviceSection Input { get; }
+    public FlexGuiConfigDeviceSection Output { get; }
 
-        public FlexGUIConfig()
-        {
-            input = new FlexGUIConfigDeviceSection();
-            output = new FlexGUIConfigDeviceSection();
-        }
-
-    }
-    public class FlexGUIConfigDeviceSection
+    public FlexGuiConfig()
     {
-        public string device { get; set; }
-        public double? suggestedLatencySeconds { get; set; } = null;
-        public bool? wasapiExclusiveMode { get; set; } = null;
-        public bool? wasapiAutoConvert { get; set; } = null;
-        public int? channels { get; set; }
+        Input = new FlexGuiConfigDeviceSection();
+        Output = new FlexGuiConfigDeviceSection();
     }
+
+}
+public class FlexGuiConfigDeviceSection
+{
+    public string Device { get; set; }
+    public double? SuggestedLatencySeconds { get; set; }
+    public bool? WasapiExclusiveMode { get; set; }
+    public bool? WasapiAutoConvert { get; set; }
+    public int? Channels { get; set; }
 }

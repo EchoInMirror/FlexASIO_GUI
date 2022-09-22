@@ -57,4 +57,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Form1_Form1_FlexASIO_GUI__0_" xml:space="preserve">
+    <value>FlexASIO GUI {0}</value>
+  </data>
+  <data name="Form1_OnTreeViewSelected__None_" xml:space="preserve">
+    <value>(None)</value>
+  </data>
 </root>

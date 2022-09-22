@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -8,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Globalization;
 using Nett;
-using System.Runtime.InteropServices;
 using NAudio.CoreAudioApi;
 
 namespace FlexASIOGUI
@@ -16,54 +14,54 @@ namespace FlexASIOGUI
     public partial class Form1 : Form
     {
 
-        private bool InitDone = false;
-        private string TOMLPath;
-        private FlexGUIConfig flexGUIConfig;
-        private Encoding legacyEncoding;
-        private string flexasioGuiVersion = "EIMChanged";
-        private string flexasioVersion = "1.9";
-        private string tomlName = "FlexASIO.toml";
-        private string docUrl = "https://github.com/EchoInMirror/FlexASIO_GUI";
-
-        [DllImport(@"C:\Program Files\FlexASIO\x64\FlexASIO.dll")]
-        public static extern int Initialize(string PathName, bool TestMode);
-        [DllImport(@"kernel32.dll")]
-        public static extern uint GetACP();
+        private readonly bool _initDone;
+        private readonly string _tomlPath;
+        private FlexGuiConfig _flexGuiConfig;
+        private const string FlexasioGuiVersion = "EIMChanged";
+        private const string FlexasioVersion = "1.9";
+        private const string TomlName = "FlexASIO.toml";
+        private const string DocUrl = "https://github.com/EchoInMirror/FlexASIO_GUI";
 
         public Form1()
         {
             InitializeComponent();
             
-            this.Text = $"FlexASIO GUI {flexasioGuiVersion}";
+            Text = $@"FlexASIO GUI {FlexasioGuiVersion}";
 
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            var customCulture = (CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             // get the value of the "Language for non-Unicode programs" setting (1252 for English)
             // note: in Win11 this could be UTF-8 already, since it's natively supported
-            legacyEncoding = Encoding.GetEncoding("GBK");
+            Encoding.GetEncoding("GBK");
 
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
             CultureInfo.DefaultThreadCurrentCulture = customCulture;
             CultureInfo.DefaultThreadCurrentUICulture = customCulture;
 
-            TOMLPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\{tomlName}";
+            _tomlPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\{TomlName}";
             
-            this.LoadFlexASIOConfig(TOMLPath);
+            this.LoadFlexAsioConfig(_tomlPath);
 
-            InitDone = true;
+            _initDone = true;
             
-            SetStatusMessage($"FlexASIO GUI for FlexASIO {flexasioVersion} started (NAudio 2.1.0)");
+            SetStatusMessage($"FlexASIO GUI for FlexASIO {FlexasioVersion} started (NAudio 2.1.0)");
             GenerateOutput();
         }
 
-        private FlexGUIConfig LoadFlexASIOConfig(string tomlPath)
+        public sealed override string Text
         {
-            flexGUIConfig = new FlexGUIConfig();
+            get => base.Text;
+            set => base.Text = value;
+        }
+
+        private void LoadFlexAsioConfig(string tomlPath)
+        {
+            _flexGuiConfig = new FlexGuiConfig();
             if (File.Exists(tomlPath))
             {
-                flexGUIConfig = Toml.ReadFile<FlexGUIConfig>(tomlPath);
+                _flexGuiConfig = Toml.ReadFile<FlexGuiConfig>(tomlPath);
             }
 
             numericBufferSize.Maximum = 8192;
@@ -78,70 +76,54 @@ namespace FlexASIOGUI
             //     comboBackend.Items.Add(Configuration.GetHostApiInfo(i).name);
             // }
 
-            if (comboBackend.Items.Contains(flexGUIConfig.backend))
-            {
-                comboBackend.SelectedIndex = comboBackend.Items.IndexOf(flexGUIConfig.backend);
-            }
-            else
-            {
-                comboBackend.SelectedIndex = 0;
-            }
+            comboBackend.SelectedIndex = comboBackend.Items.Contains(_flexGuiConfig.Backend) ? comboBackend.Items.IndexOf(_flexGuiConfig.Backend) : 0;
 
-            if (flexGUIConfig.bufferSizeSamples != null)
-                numericBufferSize.Value = (Int64)flexGUIConfig.bufferSizeSamples;
-            checkBoxSetBufferSize.Checked = numericBufferSize.Enabled = flexGUIConfig.bufferSizeSamples != null;
+            if (_flexGuiConfig.BufferSizeSamples != null)
+                numericBufferSize.Value = (Int64)_flexGuiConfig.BufferSizeSamples;
+            checkBoxSetBufferSize.Checked = numericBufferSize.Enabled = _flexGuiConfig.BufferSizeSamples != null;
 
-            treeDevicesInput.SelectedNode = treeDevicesInput.Nodes.Cast<TreeNode>().FirstOrDefault(x => x.Text == (flexGUIConfig.input.device == "" ? "(None)" : flexGUIConfig.input.device));
-            treeDevicesOutput.SelectedNode = treeDevicesOutput.Nodes.Cast<TreeNode>().FirstOrDefault(x => x.Text == (flexGUIConfig.output.device == "" ? "(None)" : flexGUIConfig.output.device));
+            treeDevicesInput.SelectedNode = treeDevicesInput.Nodes.Cast<TreeNode>().FirstOrDefault(x => x.Text == (_flexGuiConfig.Input.Device == "" ? "(None)" : _flexGuiConfig.Input.Device));
+            treeDevicesOutput.SelectedNode = treeDevicesOutput.Nodes.Cast<TreeNode>().FirstOrDefault(x => x.Text == (_flexGuiConfig.Output.Device == "" ? "(None)" : _flexGuiConfig.Output.Device));
 
-            checkBoxSetInputLatency.Checked = numericLatencyInput.Enabled = flexGUIConfig.input.suggestedLatencySeconds != null;
-            checkBoxSetOutputLatency.Checked = numericLatencyOutput.Enabled = flexGUIConfig.output.suggestedLatencySeconds != null;
+            checkBoxSetInputLatency.Checked = numericLatencyInput.Enabled = _flexGuiConfig.Input.SuggestedLatencySeconds != null;
+            checkBoxSetOutputLatency.Checked = numericLatencyOutput.Enabled = _flexGuiConfig.Output.SuggestedLatencySeconds != null;
 
-            if (flexGUIConfig.input.suggestedLatencySeconds != null)
-                numericLatencyInput.Value = (decimal)(double)flexGUIConfig.input.suggestedLatencySeconds;
-            if (flexGUIConfig.output.suggestedLatencySeconds != null)
-                numericLatencyOutput.Value = (decimal)(double)flexGUIConfig.output.suggestedLatencySeconds;
+            if (_flexGuiConfig.Input.SuggestedLatencySeconds != null)
+                numericLatencyInput.Value = (decimal)(double)_flexGuiConfig.Input.SuggestedLatencySeconds;
+            if (_flexGuiConfig.Output.SuggestedLatencySeconds != null)
+                numericLatencyOutput.Value = (decimal)(double)_flexGuiConfig.Output.SuggestedLatencySeconds;
 
-            numericChannelsInput.Value = (decimal)(flexGUIConfig.input.channels ?? 0);
-            numericChannelsOutput.Value = (decimal)(flexGUIConfig.output.channels ?? 0);
+            numericChannelsInput.Value = _flexGuiConfig.Input.Channels ?? 0;
+            numericChannelsOutput.Value = _flexGuiConfig.Output.Channels ?? 0;
 
-            checkBoxWasapiInputSet.Checked = flexGUIConfig.input.wasapiExclusiveMode != null || flexGUIConfig.input.wasapiAutoConvert != null;
-            checkBoxWasapiOutputSet.Checked = flexGUIConfig.output.wasapiExclusiveMode != null || flexGUIConfig.output.wasapiAutoConvert != null;
+            checkBoxWasapiInputSet.Checked = _flexGuiConfig.Input.WasapiExclusiveMode != null || _flexGuiConfig.Input.WasapiAutoConvert != null;
+            checkBoxWasapiOutputSet.Checked = _flexGuiConfig.Output.WasapiExclusiveMode != null || _flexGuiConfig.Output.WasapiAutoConvert != null;
 
-            wasapiExclusiveInput.Enabled = flexGUIConfig.input.wasapiExclusiveMode != null;
-            wasapiExclusiveInput.Checked = flexGUIConfig.input.wasapiExclusiveMode ?? false;
-            wasapiExclusiveOutput.Enabled = flexGUIConfig.output.wasapiExclusiveMode != null;
-            wasapiExclusiveOutput.Checked = flexGUIConfig.output.wasapiExclusiveMode ?? false;
+            wasapiExclusiveInput.Enabled = _flexGuiConfig.Input.WasapiExclusiveMode != null;
+            wasapiExclusiveInput.Checked = _flexGuiConfig.Input.WasapiExclusiveMode ?? false;
+            wasapiExclusiveOutput.Enabled = _flexGuiConfig.Output.WasapiExclusiveMode != null;
+            wasapiExclusiveOutput.Checked = _flexGuiConfig.Output.WasapiExclusiveMode ?? false;
 
-            wasapiAutoConvertInput.Enabled = flexGUIConfig.input.wasapiAutoConvert != null;
-            wasapiAutoConvertInput.Checked = flexGUIConfig.input.wasapiAutoConvert ?? false;
-            wasapiAutoConvertOutput.Enabled = flexGUIConfig.output.wasapiAutoConvert != null;
-            wasapiAutoConvertOutput.Checked = flexGUIConfig.output.wasapiAutoConvert ?? false;
-            return flexGUIConfig;
+            wasapiAutoConvertInput.Enabled = _flexGuiConfig.Input.WasapiAutoConvert != null;
+            wasapiAutoConvertInput.Checked = _flexGuiConfig.Input.WasapiAutoConvert ?? false;
+            wasapiAutoConvertOutput.Enabled = _flexGuiConfig.Output.WasapiAutoConvert != null;
+            wasapiAutoConvertOutput.Checked = _flexGuiConfig.Output.WasapiAutoConvert ?? false;
         }
 
-        private TreeNode[] GetDevicesForBackend(string Backend, bool Input)
+        private static TreeNode[] GetDevices(bool input)
         {
-            List<TreeNode> treeNodes = new List<TreeNode>();
-            treeNodes.Add(new TreeNode("(None)"));
+            var treeNodes = new List<TreeNode> { new TreeNode("(None)") };
+
             var devices = new MMDeviceEnumerator();
-            if (!Input)
+            if (!input)
             {
-                var enpoints = devices.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-                foreach (var endpoint in enpoints)
-                {
-                    Console.WriteLine("设备名称：" + endpoint.FriendlyName);
-                    treeNodes.Add(new TreeNode(endpoint.FriendlyName));
-                }
+                var endpoints = devices.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+                treeNodes.AddRange(endpoints.Select(endpoint => new TreeNode(endpoint.FriendlyName)));
             }
             else
             {
-                var enpoints = devices.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
-                foreach (var endpoint in enpoints)
-                {
-                    Console.WriteLine("设备名称：" + endpoint.FriendlyName);
-                    treeNodes.Add(new TreeNode(endpoint.FriendlyName));
-                }
+                var endpoints = devices.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+                treeNodes.AddRange(endpoints.Select(endpoint => new TreeNode(endpoint.FriendlyName)));
             }
             return treeNodes.ToArray();
         }
@@ -153,74 +135,65 @@ namespace FlexASIOGUI
 
         private void comboBackend_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var o = sender as ComboBox;
-            if (o != null)
-            {
-                var selectedBackend = o.SelectedItem as string;
-                RefreshDevices(selectedBackend);
-                if (selectedBackend == "(None)") selectedBackend = "";
-                flexGUIConfig.backend = selectedBackend;
-                GenerateOutput();
-            }
+            if (sender is not ComboBox o) return;
+            var selectedBackend = o.SelectedItem as string;
+            RefreshDevices(selectedBackend);
+            if (selectedBackend == "(None)") selectedBackend = "";
+            _flexGuiConfig.Backend = selectedBackend;
+            GenerateOutput();
         }
 
         private void RefreshDevices(string selectedBackend)
         {
             var tmpInput = treeDevicesInput.SelectedNode;
             var tmpOutput = treeDevicesOutput.SelectedNode;
-            if (selectedBackend != null)
+            if (selectedBackend == null) return;
+            treeDevicesInput.Nodes.Clear();
+            treeDevicesInput.Nodes.AddRange(GetDevices(true));
+            for (var i = 0; i < treeDevicesInput!.Nodes.Count; i++)
             {
-                treeDevicesInput.Nodes.Clear();
-                treeDevicesInput.Nodes.AddRange(GetDevicesForBackend(selectedBackend, true));
-                for (int i = 0; i < treeDevicesInput.Nodes.Count; i++)
-                {
-                    if (treeDevicesInput?.Nodes[i].Text == tmpInput?.Text)
-                    {
-                        treeDevicesInput.SelectedNode = treeDevicesInput.Nodes[i];
-                        break;
-                    }
-                }
+                if (treeDevicesInput?.Nodes[i].Text != tmpInput?.Text) continue;
+                treeDevicesInput!.SelectedNode = treeDevicesInput.Nodes[i];
+                break;
+            }
 
-                treeDevicesOutput.Nodes.Clear();
-                treeDevicesOutput.Nodes.AddRange(GetDevicesForBackend(selectedBackend, false));
-                for (int i = 0; i < treeDevicesOutput.Nodes.Count; i++)
-                {
-                    if (treeDevicesOutput?.Nodes[i].Text == tmpOutput?.Text)
-                    {
-                        treeDevicesOutput.SelectedNode = treeDevicesOutput.Nodes[i];
-                        break;
-                    }
-                }
+            treeDevicesOutput.Nodes.Clear();
+            treeDevicesOutput.Nodes.AddRange(GetDevices(false));
+            for (var i = 0; i < treeDevicesOutput!.Nodes.Count; i++)
+            {
+                if (treeDevicesOutput?.Nodes[i].Text != tmpOutput?.Text) continue;
+                treeDevicesOutput!.SelectedNode = treeDevicesOutput.Nodes[i];
+                break;
             }
         }
 
         private void GenerateOutput()
         {
-            if (!InitDone) return;
+            if (!_initDone) return;
 
-            if (!checkBoxSetBufferSize.Checked) flexGUIConfig.bufferSizeSamples = null;
-            if (!checkBoxSetInputLatency.Checked) flexGUIConfig.input.suggestedLatencySeconds = null;
-            if (!checkBoxSetOutputLatency.Checked) flexGUIConfig.output.suggestedLatencySeconds = null;
+            if (!checkBoxSetBufferSize.Checked) _flexGuiConfig.BufferSizeSamples = null;
+            if (!checkBoxSetInputLatency.Checked) _flexGuiConfig.Input.SuggestedLatencySeconds = null;
+            if (!checkBoxSetOutputLatency.Checked) _flexGuiConfig.Output.SuggestedLatencySeconds = null;
             if (!checkBoxWasapiInputSet.Checked)
             {
-                flexGUIConfig.input.wasapiAutoConvert = null;
-                flexGUIConfig.input.wasapiExclusiveMode = null;
+                _flexGuiConfig.Input.WasapiAutoConvert = null;
+                _flexGuiConfig.Input.WasapiExclusiveMode = null;
             }
             if (!checkBoxWasapiOutputSet.Checked)
             {
-                flexGUIConfig.output.wasapiAutoConvert = null;
-                flexGUIConfig.output.wasapiExclusiveMode = null;
+                _flexGuiConfig.Output.WasapiAutoConvert = null;
+                _flexGuiConfig.Output.WasapiExclusiveMode = null;
             }
 
             configOutput.Clear();
-            configOutput.Text = Toml.WriteString(flexGUIConfig);
+            configOutput.Text = Toml.WriteString(_flexGuiConfig);
         }
 
 
 
         private void SetStatusMessage(string msg)
         {
-            toolStripStatusLabel1.Text = $"{DateTime.Now.ToShortDateString()} - {DateTime.Now.ToShortTimeString()}: {msg}";
+            toolStripStatusLabel1.Text = $@"{DateTime.Now.ToShortDateString()} - {DateTime.Now.ToShortTimeString()}: {msg}";
         }
 
         private void btClipboard_Click(object sender, EventArgs e)
@@ -231,15 +204,15 @@ namespace FlexASIOGUI
 
         private void btSaveToProfile_Click(object sender, EventArgs e)
         {
-            File.WriteAllText(TOMLPath, configOutput.Text);
-            SetStatusMessage($"Configuration written to {TOMLPath}");
+            File.WriteAllText(_tomlPath, configOutput.Text);
+            SetStatusMessage($"Configuration written to {_tomlPath}");
         }
 
         private void btSaveAs_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            saveFileDialog.FileName = tomlName;
+            saveFileDialog.FileName = TomlName;
             var ret = saveFileDialog.ShowDialog();
             if (ret == DialogResult.OK)
             {
@@ -249,44 +222,32 @@ namespace FlexASIOGUI
         }
 
          private void treeDevicesInput_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            if (sender == null) return;
-            else
-            {
-                e.Node.Checked = true;
-                this.onTreeViewSelected(eventArgs: e, forInput: true);
-            }
-        }
+         {
+             if (sender == null) return;
+             e.Node!.Checked = true;
+             OnTreeViewSelected(eventArgs: e, forInput: true);
+         }
 
         private void treeDevicesOutput_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (sender == null) return;
-            else
-            {
-                e.Node.Checked = true;
-                this.onTreeViewSelected(eventArgs: e, forInput: false);
-            }
+            e.Node!.Checked = true;
+            OnTreeViewSelected(eventArgs: e, forInput: false);
         }
 
         private void treeDevicesOutput_AfterCheck(object sender, TreeViewEventArgs e)
         {
             if (sender == null) return;
-            else
-            {
-                this.onTreeViewSelected(eventArgs: e, forInput: false);
-            }
+            OnTreeViewSelected(eventArgs: e, forInput: false);
         }
 
         private void treeDevicesInput_AfterCheck(object sender, TreeViewEventArgs e)
         {
             if (sender == null) return;
-            else
-            {
-                this.onTreeViewSelected(eventArgs: e, forInput: true);
-            }
+            OnTreeViewSelected(eventArgs: e, forInput: true);
         }
 
-        private void unCheckAllOthers(TreeNode treeNode)
+        private static void UnCheckAllOthers(TreeNode treeNode)
         {
             foreach (TreeNode node in treeNode.TreeView.Nodes)
             {
@@ -297,24 +258,22 @@ namespace FlexASIOGUI
             }
         }
 
-        private void onTreeViewSelected(TreeViewEventArgs eventArgs, bool forInput)
+        private void OnTreeViewSelected(TreeViewEventArgs eventArgs, bool forInput)
         {
-            if (eventArgs.Node.Checked == true)
-            {
-                if (forInput == true)
-                    flexGUIConfig.input.device = eventArgs.Node.Text == "(None)" ? "" : eventArgs.Node.Text;
-                else
-                    flexGUIConfig.output.device = eventArgs.Node.Text == "(None)" ? "" : eventArgs.Node.Text;
-                this.unCheckAllOthers(eventArgs.Node);
-                GenerateOutput();
-            }
+            if (eventArgs.Node!.Checked != true) return;
+            if (forInput)
+                _flexGuiConfig.Input.Device = eventArgs.Node.Text == @"(None)" ? "" : eventArgs.Node.Text;
+            else
+                _flexGuiConfig.Output.Device = eventArgs.Node.Text == @"(None)" ? "" : eventArgs.Node.Text;
+            UnCheckAllOthers(eventArgs.Node);
+            GenerateOutput();
         }
 
         private void numericChannelsOutput_ValueChanged(object sender, EventArgs e)
         {
             var o = sender as NumericUpDown;
             if (o == null) return;
-            flexGUIConfig.output.channels = (o.Value > 0 ? (int?)o.Value : null);
+            _flexGuiConfig.Output.Channels = (o.Value > 0 ? (int?)o.Value : null);
             GenerateOutput();
         }
 
@@ -322,7 +281,7 @@ namespace FlexASIOGUI
         {
             var o = sender as NumericUpDown;
             if (o == null) return;
-            flexGUIConfig.input.channels = (o.Value > 0 ? (int?)o.Value : null);
+            _flexGuiConfig.Input.Channels = (o.Value > 0 ? (int?)o.Value : null);
             GenerateOutput();
         }
 
@@ -332,7 +291,7 @@ namespace FlexASIOGUI
             if (o == null) return;
             if (checkBoxSetOutputLatency.Enabled)
             {
-                flexGUIConfig.output.suggestedLatencySeconds = (o.Value > 0 ? (double)o.Value : 0);
+                _flexGuiConfig.Output.SuggestedLatencySeconds = (o.Value > 0 ? (double)o.Value : 0);
                 GenerateOutput();
             }
         }
@@ -343,7 +302,7 @@ namespace FlexASIOGUI
             if (o == null) return;
             if (checkBoxSetInputLatency.Enabled)
             {
-                flexGUIConfig.input.suggestedLatencySeconds = (o.Value > 0 ? (double)o.Value : 0);
+                _flexGuiConfig.Input.SuggestedLatencySeconds = (o.Value > 0 ? (double)o.Value : 0);
                 GenerateOutput();
             }
         }
@@ -352,7 +311,7 @@ namespace FlexASIOGUI
         {
             var o = sender as CheckBox;
             if (o == null) return;
-            flexGUIConfig.output.wasapiAutoConvert = o.Checked;
+            _flexGuiConfig.Output.WasapiAutoConvert = o.Checked;
             GenerateOutput();
         }
 
@@ -360,7 +319,7 @@ namespace FlexASIOGUI
         {
             var o = sender as CheckBox;
             if (o == null) return;
-            flexGUIConfig.output.wasapiExclusiveMode = o.Checked;
+            _flexGuiConfig.Output.WasapiExclusiveMode = o.Checked;
             GenerateOutput();
         }
 
@@ -368,7 +327,7 @@ namespace FlexASIOGUI
         {
             var o = sender as CheckBox;
             if (o == null) return;
-            flexGUIConfig.input.wasapiAutoConvert = o.Checked;
+            _flexGuiConfig.Input.WasapiAutoConvert = o.Checked;
             GenerateOutput();
         }
 
@@ -376,7 +335,7 @@ namespace FlexASIOGUI
         {
             var o = sender as CheckBox;
             if (o == null) return;
-            flexGUIConfig.input.wasapiExclusiveMode = o.Checked;
+            _flexGuiConfig.Input.WasapiExclusiveMode = o.Checked;
             GenerateOutput();
         }
 
@@ -384,7 +343,7 @@ namespace FlexASIOGUI
         {
             var o = sender as NumericUpDown;
             if (o == null) return;
-            flexGUIConfig.bufferSizeSamples = (o.Value > 0 ? (int)o.Value : 0);
+            _flexGuiConfig.BufferSizeSamples = (o.Value > 0 ? (int)o.Value : 0);
             GenerateOutput();
         }
 
@@ -396,7 +355,7 @@ namespace FlexASIOGUI
             numericLatencyInput.Enabled = o.Checked;
             if (o.Checked == false)
             {
-                flexGUIConfig.input.suggestedLatencySeconds = null;
+                _flexGuiConfig.Input.SuggestedLatencySeconds = null;
             }
             else
             {
@@ -411,7 +370,7 @@ namespace FlexASIOGUI
             if (o == null) return;
             numericLatencyOutput.Enabled = o.Checked;
             if (o.Checked == false) {
-                flexGUIConfig.output.suggestedLatencySeconds = null;
+                _flexGuiConfig.Output.SuggestedLatencySeconds = null;
             }
             else
             {
@@ -427,7 +386,7 @@ namespace FlexASIOGUI
             if (o == null) return;
             numericBufferSize.Enabled = o.Checked;
             if (o.Checked == false) { 
-                flexGUIConfig.bufferSizeSamples = null; 
+                _flexGuiConfig.BufferSizeSamples = null; 
             }
             else
             {
@@ -445,33 +404,32 @@ namespace FlexASIOGUI
 
             if (o.Checked == false)
             {
-                flexGUIConfig.input.wasapiAutoConvert = null;
-                flexGUIConfig.input.wasapiExclusiveMode = null;
+                _flexGuiConfig.Input.WasapiAutoConvert = null;
+                _flexGuiConfig.Input.WasapiExclusiveMode = null;
             }
             else
             {
-                flexGUIConfig.input.wasapiAutoConvert = wasapiAutoConvertInput.Checked;
-                flexGUIConfig.input.wasapiExclusiveMode = wasapiExclusiveInput.Checked;
+                _flexGuiConfig.Input.WasapiAutoConvert = wasapiAutoConvertInput.Checked;
+                _flexGuiConfig.Input.WasapiExclusiveMode = wasapiExclusiveInput.Checked;
             }
             GenerateOutput();
         }
 
-        private void checkBoxWasapOutputSet_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxWasapiOutputSet_CheckedChanged(object sender, EventArgs e)
         {
-            var o = sender as CheckBox;
-            if (o == null) return;
+            if (sender is not CheckBox o) return;
             wasapiAutoConvertOutput.Enabled = o.Checked;
             wasapiExclusiveOutput.Enabled = o.Checked;
 
             if (o.Checked == false)
             {
-                flexGUIConfig.output.wasapiAutoConvert = null;
-                flexGUIConfig.output.wasapiExclusiveMode = null;
+                _flexGuiConfig.Output.WasapiAutoConvert = null;
+                _flexGuiConfig.Output.WasapiExclusiveMode = null;
             }
             else
             {
-                flexGUIConfig.output.wasapiAutoConvert = wasapiAutoConvertOutput.Checked;
-                flexGUIConfig.output.wasapiExclusiveMode = wasapiExclusiveOutput.Checked;
+                _flexGuiConfig.Output.WasapiAutoConvert = wasapiAutoConvertOutput.Checked;
+                _flexGuiConfig.Output.WasapiExclusiveMode = wasapiExclusiveOutput.Checked;
             }
             GenerateOutput();
         }
@@ -484,7 +442,7 @@ namespace FlexASIOGUI
 
         private void linkLabelDocs_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start(new ProcessStartInfo(docUrl) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(DocUrl) { UseShellExecute = true });
         }
 
         private void btLoadFrom_Click(object sender, EventArgs e)
@@ -492,20 +450,20 @@ namespace FlexASIOGUI
             OpenFileDialog openFileDialog = new OpenFileDialog();
             
             openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            openFileDialog.FileName = tomlName;
-            openFileDialog.Filter = "FlexASIO Config (*.toml)|*.toml";
+            openFileDialog.FileName = TomlName;
+            openFileDialog.Filter = @"FlexASIO Config (*.toml)|*.toml";
             openFileDialog.CheckFileExists = true;
             var ret = openFileDialog.ShowDialog();
             if (ret == DialogResult.OK)
             {
                 try
                 {
-                    this.LoadFlexASIOConfig(openFileDialog.FileName);
+                    this.LoadFlexAsioConfig(openFileDialog.FileName);
                 }
                 catch (Exception)
                 {
                     SetStatusMessage($"Error loading from {openFileDialog.FileName}");
-                    this.LoadFlexASIOConfig(TOMLPath);
+                    this.LoadFlexAsioConfig(_tomlPath);
                     return;
                 }
                 
