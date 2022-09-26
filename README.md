@@ -24,9 +24,7 @@
 
 自动转换采样率: 是否允许 FlexASIO 自动转换音频的位深和采样率
 
-保存到默认 FlexASIO.toml: 将当前配置保存到 FlexASIO GUI 每次打开的默认配置
-
-另存为: 每次另存为到用户文件夹配置文件才会实际起作用，例如`C:\Users\Your Name\FlexASIO.toml`
+保存到默认 FlexASIO.toml: 保存当前配置 实际上是保存到`C:\Users\Your Name\FlexASIO.toml`
 
 [原版配置文档](https://github.com/dechamps/FlexASIO/blob/master/CONFIGURATION.md)
 
